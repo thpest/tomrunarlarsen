@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tom Runar Larsen – dikt</title>
+  <meta name="description" content="Samling av dikt av Tom Runar Larsen fra Fredrikstad.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+  <header class="topp">
+    <div class="topp-inner">
+      <span class="merke"><b>Tom Runar Larsen</b></span>
+      <nav class="nav">
+        <a href="index.html">Dikt</a>
+        <a href="skriv.html">Skriv</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="side">
+    <section class="hero" id="hero"><!-- fylles av JS --></section>
+
+    <div class="bolk-tittel">Inspirasjon</div>
+    <p class="inspirasjon" id="inspirasjon"></p>
+
+    <div class="bolk-tittel">Diktene</div>
+    <input type="text" class="sokefelt" id="sok" placeholder="Søk i titler …" aria-label="Søk i dikt">
+    <ul class="diktliste" id="diktliste"></ul>
+    <p class="tom-melding" id="ingen" style="display:none">Ingen dikt funnet.</p>
+  </main>
+
+  <footer class="bunn">
+    © <span id="aar"></span> Tom Runar Larsen · Fredrikstad
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let ALLE = [];
+
+    function tegnListe(dikt) {
+      const ul = document.getElementById("diktliste");
+      const ingen = document.getElementById("ingen");
+      ul.innerHTML = "";
+      if (!dikt.length) { ingen.style.display = "block"; return; }
+      ingen.style.display = "none";
+      for (const d of dikt) {
+        const li = document.createElement("li");
+        const meta = metaTekst(d);
+        li.innerHTML =
+          '<a href="dikt.html?id=' + encodeURIComponent(d.id) + '">' +
+            '<span class="t">' + trygg(d.tittel) + '</span>' +
+            (meta ? '<span class="m">' + trygg(meta) + '</span>' : '') +
+          '</a>';
+        ul.appendChild(li);
+      }
+    }
+
+    async function start() {
+      document.getElementById("aar").textContent = new Date().getFullYear();
+      try {
+        const data = await hentData();
+        const p = data.poet || {};
+        document.getElementById("hero").innerHTML =
+          (p.bilde ? '<img src="' + trygg(p.bilde) + '" alt="Portrett av ' + trygg(p.navn) + '">' : '<span></span>') +
+          '<div class="presentasjon">' +
+            '<h1>' + trygg(p.navn || "") + '</h1>' +
+            '<div class="undertittel">Dikter · ' + trygg(p.sted || "") + '</div>' +
+            '<p>' + trygg(p.presentasjon || "") + '</p>' +
+          '</div>';
+        document.getElementById("inspirasjon").textContent = p.inspirasjon || "";
+
+        ALLE = data.dikt || [];
+        tegnListe(ALLE);
+
+        document.getElementById("sok").addEventListener("input", function (e) {
+          const q = e.target.value.toLowerCase().trim();
+          tegnListe(!q ? ALLE : ALLE.filter(d =>
+            (d.tittel || "").toLowerCase().includes(q) ||
+            (d.tema || "").toLowerCase().includes(q)));
+        });
+      } catch (err) {
+        document.getElementById("diktliste").innerHTML =
+          '<li style="padding:1rem 0;color:#7a2b23">' + trygg(err.message) + '</li>';
+      }
+    }
+    start();
+  </script>
+</body>
+</html>

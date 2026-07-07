@@ -1,0 +1,33 @@
+{
+  "poet": {
+    "navn": "Tom Runar Larsen",
+    "fodselsdato": "1960-10-05",
+    "sted": "Fredrikstad, Østfold",
+    "bilde": "bilder/tom_runar_larsen.png",
+    "presentasjon": "Tom Runar Larsen (f. 5. oktober 1960) er dikter og bor i Fredrikstad i Østfold. Gjennom årene har han skrevet en rekke dikt — noen lette og humoristiske, andre nære og alvorlige. På disse sidene samler han diktene sine på ett sted.",
+    "inspirasjon": "Inspirasjonen henter Tom fra livet slik det leves: fra familien og barndommen, fra naturen og årstidene rundt Fredrikstad, og fra de store og små hendelsene som setter spor. Noen dikt vokser fram av sorg og savn, andre av et smil på skakke over det som skjer i samfunnet rundt oss."
+  },
+  "dikt": [
+    {
+      "id": "til-mor",
+      "tittel": "Til mor",
+      "dato": "",
+      "tema": "familie",
+      "tekst": "(Diktteksten legges inn av Tom via «Skriv»-siden.)"
+    },
+    {
+      "id": "svineinfluensa",
+      "tittel": "Svineinfluensa",
+      "dato": "",
+      "tema": "samfunn",
+      "tekst": "(Diktteksten legges inn av Tom via «Skriv»-siden.)"
+    },
+    {
+      "id": "ufor",
+      "tittel": "Ufør",
+      "dato": "",
+      "tema": "livet",
+      "tekst": "(Diktteksten legges inn av Tom via «Skriv»-siden.)"
+    }
+  ]
+}

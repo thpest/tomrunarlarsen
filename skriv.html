@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skriv dikt – Tom Runar Larsen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+  <header class="topp">
+    <div class="topp-inner">
+      <span class="merke"><b>Tom Runar Larsen</b></span>
+      <nav class="nav">
+        <a href="index.html">Dikt</a>
+        <a href="skriv.html">Skriv</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="side">
+    <h1 style="font-weight:600;margin:0 0 .3rem">Skriv dikt</h1>
+    <p class="hjelp" style="margin-bottom:1.6rem">
+      Her kan Tom legge til, endre og fjerne dikt. Endringene lagres rett til
+      nettstedet. Første gang må du lime inn en personlig GitHub-nøkkel (se
+      hjelpeteksten nederst). Nøkkelen lagres kun i din egen nettleser.
+    </p>
+
+    <!-- Innlogging -->
+    <div class="kort" id="loggInn">
+      <label for="token">GitHub-nøkkel (personal access token)</label>
+      <input type="password" id="token" placeholder="github_pat_…" autocomplete="off">
+      <p class="hjelp">Huk av under for å slippe å lime den inn hver gang på denne maskinen.</p>
+      <label style="text-transform:none;letter-spacing:0;font-family:var(--sans);font-size:.9rem;color:var(--blekk)">
+        <input type="checkbox" id="husk" style="width:auto;margin-right:.4rem"> Husk nøkkelen på denne maskinen
+      </label>
+      <div class="knapperad">
+        <button class="knapp" id="koble">Koble til</button>
+      </div>
+    </div>
+
+    <!-- Redigering (skjult til tilkoblet) -->
+    <div id="redigering" style="display:none">
+
+      <div class="kort">
+        <label for="velg">Velg dikt</label>
+        <select id="velg"></select>
+
+        <form class="skjema" id="skjema" onsubmit="return false">
+          <label for="tittel">Tittel</label>
+          <input type="text" id="tittel" autocomplete="off">
+
+          <div style="display:flex;gap:1rem;flex-wrap:wrap">
+            <div style="flex:1;min-width:8rem">
+              <label for="dato">År / dato (valgfritt)</label>
+              <input type="text" id="dato" placeholder="f.eks. 2009" autocomplete="off">
+            </div>
+            <div style="flex:1;min-width:8rem">
+              <label for="tema">Tema (valgfritt)</label>
+              <input type="text" id="tema" placeholder="f.eks. familie" autocomplete="off">
+            </div>
+          </div>
+
+          <label for="tekst">Diktet</label>
+          <textarea id="tekst" placeholder="Skriv diktet her – linjeskift og strofer beholdes nøyaktig."></textarea>
+          <p class="hjelp">Tips: trykk Enter for nytt verselinje, og la en tom linje skille strofer.</p>
+
+          <div class="knapperad">
+            <button class="knapp" id="lagre">Lagre dikt</button>
+            <button class="knapp sekundaer" id="nytt">Tøm / nytt dikt</button>
+            <button class="knapp sekundaer" id="slett" style="border-color:#b5443a;color:#b5443a;display:none">Slett dikt</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="kort">
+        <div class="bolk-tittel" style="margin-top:0">Om Tom (forsiden)</div>
+        <label for="presentasjon">Kort presentasjon</label>
+        <textarea id="presentasjon" style="min-height:8rem"></textarea>
+        <label for="inspirasjon">Om inspirasjonen</label>
+        <textarea id="inspirasjon" style="min-height:8rem"></textarea>
+        <div class="knapperad">
+          <button class="knapp" id="lagrePoet">Lagre presentasjon</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <details style="margin-top:2rem">
+      <summary style="cursor:pointer;font-family:var(--sans);font-size:.9rem;color:var(--blekk-dus)">
+        Hvordan lage en GitHub-nøkkel? (én gang)
+      </summary>
+      <div class="hjelp" style="margin-top:.8rem;line-height:1.6">
+        <ol>
+          <li>Logg inn på github.com og gå til <b>Settings → Developer settings → Personal access tokens → Fine-grained tokens</b>.</li>
+          <li>Trykk <b>Generate new token</b>. Gi den et navn, f.eks. «Dikt».</li>
+          <li>Under <b>Repository access</b>: velg <b>Only select repositories</b> → <b>tomrunarlarsen</b>.</li>
+          <li>Under <b>Permissions → Repository permissions → Contents</b>: sett til <b>Read and write</b>.</li>
+          <li>Trykk <b>Generate token</b> og kopier nøkkelen. Lim den inn i feltet over.</li>
+        </ol>
+        Nøkkelen gir kun tilgang til dette ene repoet, og den forlater aldri din egen nettleser.
+      </div>
+    </details>
+  </main>
+
+  <footer class="bunn">
+    © <span id="aar"></span> Tom Runar Larsen · Fredrikstad
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const K = window.KONFIG;
+    const API = "https://api.github.com/repos/" + K.eier + "/" + K.repo + "/contents/" + K.datafil;
+    let TOKEN = "";
+    let DATA = null;     // hele objektet {poet, dikt}
+    let SHA = null;      // gjeldende fil-sha fra GitHub
+
+    const $ = id => document.getElementById(id);
+    document.getElementById("aar").textContent = new Date().getFullYear();
+
+    function melding(tekst, type) {
+      const s = $("status");
+      s.textContent = tekst;
+      s.className = "status vis " + (type || "");
+    }
+
+    async function githubGet() {
+      const r = await fetch(API + "?ref=" + K.gren + "&t=" + Date.now(), {
+        headers: { Authorization: "Bearer " + TOKEN, Accept: "application/vnd.github+json" },
+        cache: "no-store"
+      });
+      if (r.status === 404) return { data: { poet: {}, dikt: [] }, sha: null };
+      if (r.status === 401) throw new Error("Nøkkelen ble ikke godtatt. Sjekk at den er riktig og har «Contents: Read and write».");
+      if (!r.ok) throw new Error("Kunne ikke hente data (" + r.status + ").");
+      const j = await r.json();
+      return { data: JSON.parse(base64TilUtf8(j.content)), sha: j.sha };
+    }
+
+    async function githubPut(melding_) {
+      const kropp = {
+        message: melding_,
+        content: utf8TilBase64(JSON.stringify(DATA, null, 2) + "\n"),
+        branch: K.gren
+      };
+      if (SHA) kropp.sha = SHA;
+      const r = await fetch(API, {
+        method: "PUT",
+        headers: { Authorization: "Bearer " + TOKEN, Accept: "application/vnd.github+json" },
+        body: JSON.stringify(kropp)
+      });
+      if (!r.ok) {
+        const t = await r.text();
+        throw new Error("Lagring feilet (" + r.status + "). " + t.slice(0, 200));
+      }
+      const j = await r.json();
+      SHA = j.content.sha;   // ny sha til neste lagring
+    }
+
+    function fyllVelg() {
+      const sel = $("velg");
+      sel.innerHTML = '<option value="__nytt__">➕ Nytt dikt</option>';
+      (DATA.dikt || []).forEach(d => {
+        const o = document.createElement("option");
+        o.value = d.id;
+        o.textContent = d.tittel || "(uten tittel)";
+        sel.appendChild(o);
+      });
+    }
+
+    function fyllPoet() {
+      $("presentasjon").value = (DATA.poet && DATA.poet.presentasjon) || "";
+      $("inspirasjon").value  = (DATA.poet && DATA.poet.inspirasjon)  || "";
+    }
+
+    function tomSkjema() {
+      $("velg").value = "__nytt__";
+      $("tittel").value = ""; $("dato").value = ""; $("tema").value = ""; $("tekst").value = "";
+      $("slett").style.display = "none";
+    }
+
+    function visDikt(id) {
+      const d = (DATA.dikt || []).find(x => x.id === id);
+      if (!d) { tomSkjema(); return; }
+      $("tittel").value = d.tittel || "";
+      $("dato").value = d.dato || "";
+      $("tema").value = d.tema || "";
+      $("tekst").value = d.tekst || "";
+      $("slett").style.display = "inline-block";
+    }
+
+    // unik id ut fra tittel
+    function unikId(tittel, egenId) {
+      let base = lagId(tittel), id = base, n = 2;
+      const finnes = x => (DATA.dikt || []).some(d => d.id === x && d.id !== egenId);
+      while (finnes(id)) { id = base + "-" + n; n++; }
+      return id;
+    }
+
+    async function koble() {
+      TOKEN = $("token").value.trim();
+      if (!TOKEN) { melding("Lim inn GitHub-nøkkelen først.", "feil"); return; }
+      melding("Kobler til …", "jobb");
+      try {
+        const res = await githubGet();
+        DATA = res.data; SHA = res.sha;
+        if (!DATA.dikt) DATA.dikt = [];
+        if (!DATA.poet) DATA.poet = {};
+        if ($("husk").checked) localStorage.setItem("dikt_token", TOKEN);
+        else localStorage.removeItem("dikt_token");
+        $("loggInn").style.display = "none";
+        $("redigering").style.display = "block";
+        fyllVelg(); fyllPoet(); tomSkjema();
+        melding("Tilkoblet. Du kan nå redigere dikt.", "ok");
+      } catch (e) {
+        melding(e.message, "feil");
+      }
+    }
+
+    async function lagreDikt() {
+      const tittel = $("tittel").value.trim();
+      const tekst  = $("tekst").value.replace(/\r\n/g, "\n");
+      if (!tittel) { melding("Diktet må ha en tittel.", "feil"); return; }
+      if (!tekst.trim()) { melding("Diktet er tomt.", "feil"); return; }
+      const valgt = $("velg").value;
+      $("lagre").disabled = true;
+      melding("Lagrer …", "jobb");
+      try {
+        // hent ferskeste versjon før vi skriver (unngå å overskrive)
+        const res = await githubGet();
+        DATA = res.data; SHA = res.sha;
+        if (!DATA.dikt) DATA.dikt = [];
+
+        const felt = { dato: $("dato").value.trim(), tema: $("tema").value.trim() };
+        if (valgt && valgt !== "__nytt__") {
+          const d = DATA.dikt.find(x => x.id === valgt);
+          if (d) { d.tittel = tittel; d.tekst = tekst; Object.assign(d, felt); }
+          else DATA.dikt.push({ id: unikId(tittel), tittel, tekst, ...felt });
+        } else {
+          DATA.dikt.push({ id: unikId(tittel), tittel, tekst, ...felt });
+        }
+        await githubPut("Dikt: " + tittel);
+        fyllVelg();
+        // pek velgeren på det lagrede diktet
+        const lagret = DATA.dikt.find(x => x.tittel === tittel);
+        if (lagret) { $("velg").value = lagret.id; $("slett").style.display = "inline-block"; }
+        melding('«' + tittel + '» er lagret. Det vises på nettstedet om et lite øyeblikk.', "ok");
+      } catch (e) {
+        melding(e.message, "feil");
+      } finally {
+        $("lagre").disabled = false;
+      }
+    }
+
+    async function slettDikt() {
+      const valgt = $("velg").value;
+      if (!valgt || valgt === "__nytt__") return;
+      const d = (DATA.dikt || []).find(x => x.id === valgt);
+      if (!d) return;
+      if (!confirm('Slette diktet «' + d.tittel + '»?')) return;
+      melding("Sletter …", "jobb");
+      try {
+        const res = await githubGet();
+        DATA = res.data; SHA = res.sha;
+        DATA.dikt = (DATA.dikt || []).filter(x => x.id !== valgt);
+        await githubPut("Slettet dikt: " + d.tittel);
+        fyllVelg(); tomSkjema();
+        melding("Diktet er slettet.", "ok");
+      } catch (e) {
+        melding(e.message, "feil");
+      }
+    }
+
+    async function lagrePoet() {
+      melding("Lagrer presentasjon …", "jobb");
+      try {
+        const res = await githubGet();
+        DATA = res.data; SHA = res.sha;
+        if (!DATA.poet) DATA.poet = {};
+        DATA.poet.presentasjon = $("presentasjon").value.trim();
+        DATA.poet.inspirasjon  = $("inspirasjon").value.trim();
+        await githubPut("Oppdatert presentasjon");
+        melding("Presentasjonen er lagret.", "ok");
+      } catch (e) {
+        melding(e.message, "feil");
+      }
+    }
+
+    // koble opp knapper
+    $("koble").addEventListener("click", koble);
+    $("velg").addEventListener("change", e => visDikt(e.target.value));
+    $("lagre").addEventListener("click", lagreDikt);
+    $("nytt").addEventListener("click", tomSkjema);
+    $("slett").addEventListener("click", slettDikt);
+    $("lagrePoet").addEventListener("click", lagrePoet);
+
+    // forhåndsutfyll nøkkel hvis husket
+    const husket = localStorage.getItem("dikt_token");
+    if (husket) { $("token").value = husket; $("husk").checked = true; }
+  </script>
+</body>
+</html>

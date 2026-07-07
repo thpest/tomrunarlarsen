@@ -1,0 +1,284 @@
+/* ---------------------------------------------------------------------------
+   Diktnettsted – Tom Runar Larsen
+   Rolig, litterær stil: serif, god luft, paper-tone. Fungerer på mobil.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --papir:      #fbf8f1;
+  --papir-kort: #ffffff;
+  --blekk:      #2b2620;
+  --blekk-dus:  #6b6357;
+  --strek:      #e7ded0;
+  --aksent:     #7a5c3e;   /* varm brun */
+  --aksent-lys: #a98b68;
+  --maksbredde: 46rem;
+  --serif: "EB Garamond", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --sans:  "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--papir);
+  color: var(--blekk);
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  line-height: 1.7;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--aksent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* -------- Topp / navigasjon -------- */
+.topp {
+  border-bottom: 1px solid var(--strek);
+  background: var(--papir);
+}
+.topp-inner {
+  max-width: var(--maksbredde);
+  margin: 0 auto;
+  padding: 1.1rem 1.4rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.merke {
+  font-size: 1.15rem;
+  letter-spacing: .02em;
+  color: var(--blekk);
+}
+.merke b { font-weight: 600; }
+.nav a {
+  margin-left: 1.2rem;
+  font-family: var(--sans);
+  font-size: .82rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--blekk-dus);
+}
+.nav a:hover { color: var(--aksent); text-decoration: none; }
+
+/* -------- Sideramme -------- */
+.side {
+  max-width: var(--maksbredde);
+  margin: 0 auto;
+  padding: 2.6rem 1.4rem 5rem;
+}
+
+/* -------- Forside: presentasjon -------- */
+.hero {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 1.8rem;
+  align-items: start;
+  margin-bottom: 2.6rem;
+}
+.hero img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid var(--strek);
+  box-shadow: 0 6px 22px rgba(60,45,25,.12);
+}
+.hero h1 {
+  font-size: 2.3rem;
+  font-weight: 600;
+  margin: 0 0 .2rem;
+  line-height: 1.15;
+}
+.hero .undertittel {
+  font-family: var(--sans);
+  font-size: .8rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--blekk-dus);
+  margin-bottom: .9rem;
+}
+.presentasjon p { margin: 0 0 1rem; }
+
+.bolk-tittel {
+  font-family: var(--sans);
+  font-size: .78rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--aksent);
+  margin: 2.4rem 0 .6rem;
+}
+.inspirasjon {
+  border-left: 3px solid var(--aksent-lys);
+  padding-left: 1.2rem;
+  font-style: italic;
+  color: var(--blekk-dus);
+}
+
+/* -------- Diktliste -------- */
+.diktliste { list-style: none; margin: 0; padding: 0; }
+.diktliste li { border-top: 1px solid var(--strek); }
+.diktliste li:last-child { border-bottom: 1px solid var(--strek); }
+.diktliste a {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: .95rem .2rem;
+  color: var(--blekk);
+}
+.diktliste a:hover { color: var(--aksent); text-decoration: none; }
+.diktliste .t { font-size: 1.3rem; }
+.diktliste .m {
+  font-family: var(--sans);
+  font-size: .78rem;
+  letter-spacing: .05em;
+  color: var(--blekk-dus);
+  white-space: nowrap;
+}
+
+.sokefelt {
+  width: 100%;
+  padding: .7rem .9rem;
+  margin-bottom: 1.4rem;
+  font-family: var(--serif);
+  font-size: 1rem;
+  color: var(--blekk);
+  background: var(--papir-kort);
+  border: 1px solid var(--strek);
+  border-radius: 8px;
+}
+.sokefelt:focus { outline: 2px solid var(--aksent-lys); border-color: var(--aksent-lys); }
+
+/* -------- Enkeltdikt -------- */
+.dikt-header { margin-bottom: 1.6rem; }
+.dikt-header h1 { font-size: 2.1rem; font-weight: 600; margin: 0 0 .3rem; }
+.dikt-meta {
+  font-family: var(--sans);
+  font-size: .8rem;
+  letter-spacing: .06em;
+  color: var(--blekk-dus);
+}
+.dikt-tekst {
+  white-space: pre-wrap;
+  font-size: 1.22rem;
+  line-height: 1.85;
+  margin: 1.4rem 0 2.4rem;
+}
+.tilbake {
+  font-family: var(--sans);
+  font-size: .82rem;
+  letter-spacing: .06em;
+  color: var(--blekk-dus);
+}
+
+/* -------- Skjema / skriveside -------- */
+.skjema { display: block; }
+.skjema label {
+  display: block;
+  font-family: var(--sans);
+  font-size: .78rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--blekk-dus);
+  margin: 1.2rem 0 .35rem;
+}
+.skjema input[type=text],
+.skjema input[type=password],
+.skjema select,
+.skjema textarea {
+  width: 100%;
+  padding: .65rem .8rem;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: var(--blekk);
+  background: var(--papir-kort);
+  border: 1px solid var(--strek);
+  border-radius: 8px;
+}
+.skjema textarea {
+  min-height: 20rem;
+  line-height: 1.7;
+  resize: vertical;
+  white-space: pre-wrap;
+}
+.skjema input:focus,
+.skjema select:focus,
+.skjema textarea:focus {
+  outline: 2px solid var(--aksent-lys);
+  border-color: var(--aksent-lys);
+}
+.hjelp {
+  font-family: var(--sans);
+  font-size: .82rem;
+  color: var(--blekk-dus);
+  margin: .3rem 0 0;
+}
+.knapperad { margin-top: 1.6rem; display: flex; gap: .8rem; flex-wrap: wrap; }
+.knapp {
+  font-family: var(--sans);
+  font-size: .9rem;
+  letter-spacing: .04em;
+  padding: .7rem 1.4rem;
+  border: 1px solid var(--aksent);
+  border-radius: 8px;
+  background: var(--aksent);
+  color: #fff;
+  cursor: pointer;
+}
+.knapp:hover { background: var(--aksent-lys); border-color: var(--aksent-lys); }
+.knapp.sekundaer { background: transparent; color: var(--aksent); }
+.knapp.sekundaer:hover { background: #f2ead9; color: var(--aksent); }
+.knapp:disabled { opacity: .5; cursor: default; }
+
+.status {
+  margin-top: 1.2rem;
+  padding: .8rem 1rem;
+  border-radius: 8px;
+  font-family: var(--sans);
+  font-size: .9rem;
+  display: none;
+}
+.status.vis { display: block; }
+.status.ok  { background: #e7f3e3; color: #2f5d2a; border: 1px solid #bcdcb3; }
+.status.feil{ background: #f7e3e1; color: #7a2b23; border: 1px solid #e2b6b0; }
+.status.jobb{ background: #eef0f4; color: #38414f; border: 1px solid #d3d8e0; }
+
+.kort {
+  background: var(--papir-kort);
+  border: 1px solid var(--strek);
+  border-radius: 12px;
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 1.6rem;
+}
+
+.tom-melding {
+  color: var(--blekk-dus);
+  font-style: italic;
+  padding: 1.5rem 0;
+}
+
+/* -------- Bunntekst -------- */
+.bunn {
+  max-width: var(--maksbredde);
+  margin: 0 auto;
+  padding: 2rem 1.4rem 3rem;
+  border-top: 1px solid var(--strek);
+  font-family: var(--sans);
+  font-size: .8rem;
+  color: var(--blekk-dus);
+  text-align: center;
+}
+
+/* -------- Mobil -------- */
+@media (max-width: 560px) {
+  body { font-size: 1.08rem; }
+  .hero { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+  .hero .undertittel { text-align: center; }
+  .hero h1 { font-size: 2rem; }
+  .inspirasjon { text-align: left; }
+}
